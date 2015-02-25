@@ -1,8 +1,8 @@
 function Enemies(game, spriteName, size)
 {
-	var size = size;
-	var spriteName = spriteName
-	var group = game.add.group();
+	this.size = size;
+	this.spriteName = spriteName
+	this.group = game.add.group();
 
 	var i;
 	for(i = 0; i < size; i++)
@@ -10,16 +10,16 @@ function Enemies(game, spriteName, size)
 		this.addEnemy();
 	}
 
-	group.setAll('outOfBoundsKill', true);
-    group.setAll('checkWorldBounds', true);
+	this.group.setAll('outOfBoundsKill', true);
+    this.group.setAll('checkWorldBounds', true);
        // enemies.setAll('body.collideWorldBounds', false);
-    group.setAll('body.kinematic', true);
+    this.group.setAll('body.kinematic', true);
 
 }
 
 Enemies.prototype.getGroup = function()
 {
-	return group;
+	return this.group;
 };
 
 Enemies.prototype.addEnemy = function()
@@ -28,10 +28,10 @@ Enemies.prototype.addEnemy = function()
 	sprite.exists = false;
     sprite.alive = false;
     game.physics.p2.enable(sprite, true);
-    group.add(sprite)
+    this.group.add(sprite)
 };
 
 Enemies.prototype.forEach = function(bodyCallBack)
 {
-	group.forEach(bodyCallBack, this)
+	this.group.forEach(bodyCallBack, this)
 };

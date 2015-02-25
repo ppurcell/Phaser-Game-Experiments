@@ -62,7 +62,6 @@ Game.Play.prototype =
         //Define our Sprite groups
         enemies = new Enemies(game, 'tree', 10);
         enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
-        alert(enemies.size);
 
         ciders = new Ciders(game, 1);
 
