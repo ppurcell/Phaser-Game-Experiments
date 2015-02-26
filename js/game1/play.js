@@ -1,28 +1,25 @@
 Game.Play = function(game) {};
 
-//group collections
+//Sprites
 var player;
 var enemies;
 var ciders;
 
-var scoreTime;
-var scoreInterval = 2000;
-var enemyTime;
-var enemyInterval = 1500;
-var powerupsTime;
-var powerupInterval = 4000;
+var scoreInterval;
+var enemyInterval;
+var powerupInterval;
+var hitInterval;
 
 var hits = 0;
 var checksCollected =0;
 var cidersCollected = 0;
 
+//Text Indicators
 var score;
 var multiplier;
 var strikes;
 
 var restart = false;
-
-var hitTimer;
 
 Game.Play.prototype =  
 {
@@ -42,13 +39,15 @@ Game.Play.prototype =
         game.physics.startSystem(Phaser.Physics.P2JS);
 
         player = new Player(game);
+        player.getBody().onBeginContact.add(this.playerHit, this);
+
  
         //Define our Sprite groups
         enemies = new Enemies(game, 'tree', 10);
         enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
-        ciders = new Ciders(game, 1);
+        ciders = new Ciders(game, 5);
 
-        //  Our controls.
+        //  1 controls.
         cursors = game.input.keyboard.createCursorKeys();
 
         //Text indicators
@@ -56,10 +55,10 @@ Game.Play.prototype =
         multiplier = new TextIndicator(game, 'Multiplier: %sX',1, 15, 30);
         strikes = new TextIndicator(game, 'Strikes: %s', '', 15, 45)
 
-        scoreTime = 0;
-        enemyTime = 0;
-        hitTimer = 0;
-        powerupsTime = 0 + powerupInterval;
+        scoreInterval = new Interval(2000, 0);
+        enemyInterval = new Interval(1500, 0);
+        powerupInterval = new Interval(4000, 4000);
+        hitInterval = new Interval(300,0);
     },
 
     update: function() {
@@ -67,31 +66,22 @@ Game.Play.prototype =
         player.resetVelocity();
         player.move(cursors);
 
-
-        if(game.time.now > scoreTime )
+        if(scoreInterval.checkInterval(game.time.now))
         {
-            scoreTime = game.time.now + scoreInterval
             score.setValue(score.getValue() + (1*multiplier.getValue()));
         }
-        if(game.time.now > enemyTime)
+        if(enemyInterval.checkInterval(game.time.now))
         {
             this.spawnEnemy();
         }
-        if(game.time.now > powerupsTime)
+        if(powerupInterval.checkInterval(game.time.now))
         {
             this.spawnPowerUp();
         }
 
-        player.getBody().onBeginContact.add(this.playerHit, this);
-
-        //game.physics.p2.overlap(player, enemies, this.playerHit, null, this);
-
-
     },
     spawnEnemy: function()
     {
-        enemyTime = game.time.now + enemyInterval;
-
         var pattern = rand(4);
         var x = 0;
         var y = 0;
@@ -139,7 +129,7 @@ Game.Play.prototype =
     },
     playerHit: function(contact, enemy)
     {
-        if(contact !=null && contact.sprite.key=='tree' && hitTimer < this.game.time.now)
+        if(contact !=null && contact.sprite.key=='tree' && hitInterval.checkInterval(game.time.now))
         {
             player.performCollision();
             this.game.tweens.removeFrom(contact);
@@ -147,7 +137,6 @@ Game.Play.prototype =
             contact.sprite.y = -100;
             contact.sprite.kill();
             strikes.setValue(strikes.getValue() + "X")
-            hitTimer = this.game.time.now + 300;
             if(++hits >= 3)
             {
                game.state.start('Over');
