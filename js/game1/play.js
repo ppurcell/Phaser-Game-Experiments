@@ -43,9 +43,9 @@ Game.Play.prototype =
 
  
         //Define our Sprite groups
-        enemies = new Enemies(game, 'tree', 10);
-        enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
-        ciders = new Ciders(game, 5);
+        enemies = new Enemies(game, 'beer', 10);
+       // enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
+        ciders = new Ciders(game, 1);
 
         //  1 controls.
         cursors = game.input.keyboard.createCursorKeys();
@@ -55,16 +55,17 @@ Game.Play.prototype =
         multiplier = new TextIndicator(game, 'Multiplier: %sX',1, 15, 30);
         strikes = new TextIndicator(game, 'Strikes: %s', '', 15, 45)
 
-        scoreInterval = new Interval(2000, 0);
-        enemyInterval = new Interval(1500, 0);
-        powerupInterval = new Interval(4000, 4000);
-        hitInterval = new Interval(300,0);
+        scoreInterval = new Interval('static', 2000, 0);
+        enemyInterval = new Interval('static', 1500, 0);
+        powerupInterval = new Interval('random', 20000, game.time.now+4000);
+        hitInterval = new Interval('static', 300,0);
     },
 
     update: function() {
 
         player.resetVelocity();
         player.move(cursors);
+        enemies.rotateAll(2);
 
         if(scoreInterval.checkInterval(game.time.now))
         {
@@ -129,7 +130,7 @@ Game.Play.prototype =
     },
     playerHit: function(contact, enemy)
     {
-        if(contact !=null && contact.sprite.key=='tree' && hitInterval.checkInterval(game.time.now))
+        if(contact !=null && contact.sprite.key=='beer' && hitInterval.checkInterval(game.time.now))
         {
             player.performCollision();
             this.game.tweens.removeFrom(contact);
@@ -139,7 +140,7 @@ Game.Play.prototype =
             strikes.setValue(strikes.getValue() + "X")
             if(++hits >= 3)
             {
-               game.state.start('Over');
+               game.state.start('Over', true, false, 'game_over', 'Game Over!');
             }
         }
         if(contact !=null && contact.sprite.key=='cider')
@@ -154,7 +155,7 @@ Game.Play.prototype =
         var cider = ciders.getGroup().getFirstDead();
         if(cider !=null)
         {
-            cider.reset(250,250);
+            cider.reset(rand(w-20),rand(h-20));
             powerupsTime = game.time.now + powerupInterval;
         }
     }

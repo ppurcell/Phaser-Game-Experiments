@@ -36,7 +36,7 @@ Player.prototype.resetVelocity = function()
 {
 	this.sprite.body.velocity.x = 0;
     this.sprite.body.velocity.y = 0;
-    this.sprite.body.rotation = 0;
+    this.sprite.body.angle = 0;
 };
 Player.prototype.resetSpeed = function()
 {

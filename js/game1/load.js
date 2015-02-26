@@ -20,11 +20,12 @@ Game.Load.prototype =
     	game.load.spritesheet('tree', 'assets/tree-sticker.png', 70, 70);
     	game.load.image('apple', 'assets/apple.png');
     	game.load.image('cider', 'assets/moonshine.png');
+    	game.load.image('beer', 'assets/beer.png');
     	game.load.image('empty-moonshine', 'assets/empty-moonshine.png');
     	game.load.image('check', 'assets/check.png');
 	},
 	create: function()
 	{
-		game.state.start('Play');
+		game.state.start('Over', true, false, 'start', '');
 	}
 };

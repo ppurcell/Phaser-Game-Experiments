@@ -1,8 +1,38 @@
 Game.Over = function (game) { };
 
 Game.Over.prototype = {
-    create: function () {       
-        label = game.add.text(w/2, h/2, 'game over\n\nscore: '+score.getValue()+'\n\npress the UP arrow key\nto restart', { font: '30px Arial', fill: '#fff', align: 'center' });
+    init: function(state,message)
+    {
+        this.state = state;
+        this.message = message;
+    },
+    create: function () {     
+        if(this.state == 'game_over')
+        {
+            label = game.add.text(
+            w/2,
+            h/2, 
+            this.message
+            +'\n\nscore: '
+            + score.getValue()
+            + '\n\npress the UP arrow key\nto restart',
+            { font: '30px Arial', fill: '#fff', align: 'center' });
+
+        }
+        else if(this.state == 'start')
+        {
+            label = game.add.text(
+            w/2,
+            h/2, 
+            "Pukin's Hash Quest"+'\n\n'
+            +'Beer Bad!!'+'\n'
+            +'MoonShine Good!!'
+            + '\n\npress the UP arrow key\nto Start',
+            { font: '30px Arial', fill: '#fff', align: 'center' });
+
+        }
+
+
         label.anchor.setTo(0.5, 0.5);
         
         this.cursor = game.input.keyboard.createCursorKeys();
