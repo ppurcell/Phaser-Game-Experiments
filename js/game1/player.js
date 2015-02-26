@@ -1,30 +1,95 @@
-function Player(game, size)
+Player.baseSpeed = 150;
+
+function Player(game)
 {
-	this.size = size;
-	this.group = game.add.group();
+	this.playerSpeed = Player.baseSpeed;
+	this.sprite = game.add.sprite(game.world.width / 2, game.world.height / 2, 'hasher');
+	game.physics.p2.enable(this.getSprite(), false);
 
-	var i;
-	for(i = 0; i < size; i++)
-	{
-		this.addCider();
-	}
-
-	this.group.setAll('body.kinematic', true);
-
+	this.setupPlayer();
 }
 
-Ciders.prototype.getGroup = function()
+Player.prototype.setupPlayer = function()
 {
-	return this.group;
+	this.sprite.body.collideWorldBounds = true;
+
+	this.sprite.animations.add('left', [2, 3], 10, true);
+    this.sprite.animations.add('right', [2, 3], 10, true);
+    this.sprite.animations.add('up', [6, 7], 10, true);
+    this.sprite.animations.add('down', [4, 5], 10, true);
+
+    this.sprite.body.setRectangle(this.sprite.width-10,this.sprite.height,0,0);
 };
 
-Ciders.prototype.addCider = function()
+Player.prototype.getSprite = function()
 {
-	var cider = game.add.sprite(-40, -40, 'cider');
-	cider.exists = false;
-    cider.alive = false;
-    cider.scale.x = .5;
-	cider.scale.y = .5;
-    game.physics.p2.enable(cider, false);
-    this.group.add(cider)
+	return this.sprite;
+};
+
+
+Player.prototype.getBody = function()
+{
+	return this.sprite.body;
+};
+
+Player.prototype.resetVelocity = function()
+{
+	this.sprite.body.velocity.x = 0;
+    this.sprite.body.velocity.y = 0;
+    this.sprite.body.rotation = 0;
+};
+Player.prototype.resetSpeed = function()
+{
+	this.speed = Player.baseSpeed;
+};
+Player.prototype.performCollision = function()
+{
+	this.playerSpeed -=30;
 }
+
+Player.prototype.move = function(cursors)
+{
+	var currentDirection = '';
+	 if (cursors.left.isDown) {
+            this.sprite.scale.x = 1.0;
+            this.sprite.body.velocity.x = -this.playerSpeed;
+            currentDirection += 'left';
+        }
+        if (cursors.right.isDown) {
+            this.sprite.scale.x = -1.0;
+            this.sprite.body.velocity.x = this.playerSpeed;
+            currentDirection += 'right';
+        }
+        if (cursors.up.isDown) {
+            this.sprite.body.velocity.y = -this.playerSpeed;
+            currentDirection += 'up';
+        }
+        if (cursors.down.isDown) {
+            this.sprite.body.velocity.y = this.playerSpeed;
+            currentDirection += 'down';
+
+        }
+		if(currentDirection.indexOf('left') != -1)
+		{
+            this.sprite.animations.play('left');
+		}
+		else if(currentDirection.indexOf('right') != -1)
+		{
+            this.sprite.animations.play('right');
+		}
+		else if(currentDirection.indexOf('up') != -1)
+		{
+            this.sprite.animations.play('up');
+		}
+		else if(currentDirection.indexOf('down') != -1)
+		{
+            this.sprite.animations.play('down');
+		}
+        if (!cursors.down.isDown && !cursors.up.isDown && !cursors.left.isDown && !cursors.right.isDown) {
+            //  Stand still
+            this.sprite.animations.stop();
+            this.sprite.frame = 0;
+        }
+};	
+
+

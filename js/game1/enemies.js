@@ -1,4 +1,4 @@
-function Enemies(game, spriteName, size)
+function Enemies(game,spriteName, size)
 {
 	this.size = size;
 	this.spriteName = spriteName
@@ -12,7 +12,7 @@ function Enemies(game, spriteName, size)
 
 	this.group.setAll('outOfBoundsKill', true);
     this.group.setAll('checkWorldBounds', true);
-       // enemies.setAll('body.collideWorldBounds', false);
+    // enemies.setAll('body.collideWorldBounds', false);
     this.group.setAll('body.kinematic', true);
 
 }
