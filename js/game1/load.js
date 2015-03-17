@@ -18,9 +18,10 @@ Game.Load.prototype =
 
 		game.load.spritesheet('hasher', 'assets/hasher-sticker2.png', 50, 50);
     	game.load.spritesheet('tree', 'assets/tree-sticker.png', 70, 70);
+    	game.load.spritesheet('police', 'assets/police-sticker2.png', 46, 54);
     	game.load.image('apple', 'assets/apple.png');
     	game.load.image('cider', 'assets/moonshine.png');
-    	game.load.image('beer', 'assets/beer.png');
+    	game.load.image('beer', 'assets/beer2.png');
     	game.load.image('empty-moonshine', 'assets/empty-moonshine.png');
     	game.load.image('check', 'assets/check.png');
 	},

@@ -1,9 +1,12 @@
-Game.Play = function(game) {};
+Game.Play = function(game) 
+{
+  // var strikes;
+};
 
 //Sprites
 var player;
 var enemies;
-var ciders;
+var powerups;
 
 var scoreInterval;
 var enemyInterval;
@@ -17,7 +20,6 @@ var cidersCollected = 0;
 //Text Indicators
 var score;
 var multiplier;
-var strikes;
 
 var restart = false;
 
@@ -41,11 +43,7 @@ Game.Play.prototype =
         player = new Player(game);
         player.getBody().onBeginContact.add(this.playerHit, this);
 
- 
-        //Define our Sprite groups
-        enemies = new Enemies(game, 'beer', 10);
-       // enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
-        ciders = new Ciders(game, 1);
+        this.loadLevelThree();
 
         //  1 controls.
         cursors = game.input.keyboard.createCursorKeys();
@@ -65,7 +63,7 @@ Game.Play.prototype =
 
         player.resetVelocity();
         player.move(cursors);
-        enemies.rotateAll(2);
+        this.updateLevelThree();
 
         if(scoreInterval.checkInterval(game.time.now))
         {
@@ -75,7 +73,7 @@ Game.Play.prototype =
         {
             this.spawnEnemy();
         }
-        if(powerupInterval.checkInterval(game.time.now))
+        if(powerupInterval.checkInterval(game.time.now) && powerups != null)
         {
             this.spawnPowerUp();
         }
@@ -93,35 +91,37 @@ Game.Play.prototype =
         {
 
         if(pattern == 0)//Top to Bottom
-        {
+        {   
             x = rand(w);
-            y = (-enemy.height/2);
+            y = (-enemy.height/2)+5;
             tox = rand(w); 
             toy = h + enemy.height;
         }
         else if(pattern == 1)//Bottom to Top
         {
             x = rand(w);
-            y = h+(enemy.height/2);
+            y = h+(enemy.height/2)-5;
             tox = rand(w); 
             toy = -enemy.height;
         }
         else if(pattern == 2)//Left to Right
         {
-            x = -enemy.height/2;
+            x = (-enemy.height/2)+5;
             y = rand(h);
             tox = w + enemy.height; 
             toy = rand(h);
         }
         else if(pattern == 3)
         {
-            x = w + (enemy.height/2);
+            x = w + (enemy.height/2)-5;
             y = rand(h);
             tox = -enemy.height; 
             toy = rand(h);
         }
 
         enemy.reset(x, y);
+        if(x < tox) {enemy.scale.x = -1.0;}
+        else{enemy.scale.x = 1.0;}
         game.add.tween(enemy.body).to( { x: tox, y: toy }, 5000, Phaser.Easing.Linear.None).start();
         enemy.animations.add('move');
         enemy.animations.play('move', 5, true);
@@ -130,7 +130,7 @@ Game.Play.prototype =
     },
     playerHit: function(contact, enemy)
     {
-        if(contact !=null && contact.sprite.key=='beer' && hitInterval.checkInterval(game.time.now))
+        if(contact !=null && contact.sprite.key==enemies.spriteName && hitInterval.checkInterval(game.time.now))
         {
             player.performCollision();
             this.game.tweens.removeFrom(contact);
@@ -138,12 +138,13 @@ Game.Play.prototype =
             contact.sprite.y = -100;
             contact.sprite.kill();
             strikes.setValue(strikes.getValue() + "X")
+            multiplier.setValue(1);
             if(++hits >= 3)
             {
                game.state.start('Over', true, false, 'game_over', 'Game Over!');
             }
         }
-        if(contact !=null && contact.sprite.key=='cider')
+        if(contact !=null && powerups !=null && contact.sprite.key==powerups.spriteName)
         {
             contact.sprite.kill();
             multiplier.setValue(multiplier.getValue() + 1);
@@ -152,11 +153,39 @@ Game.Play.prototype =
     },
     spawnPowerUp: function()
     {
-        var cider = ciders.getGroup().getFirstDead();
-        if(cider !=null)
+        var powerup = powerups.getGroup().getFirstDead();
+        if(powerup !=null)
         {
-            cider.reset(rand(w-20),rand(h-20));
+            powerup.reset(rand(w-20),rand(h-20));
             powerupsTime = game.time.now + powerupInterval;
         }
+    },
+    loadLevelOne: function()
+    {
+        enemies = new Enemies(game, 'beer', 10);
+        //enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
+        powerups = new Powerups(game,'cider', 1);
+    },
+    updateLevelOne: function()
+    {
+    enemies.rotateAll(2);
+    },
+    loadLevelTwo: function()
+    {
+        enemies = new Enemies(game, 'tree', 10);
+        enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
+        powerups = new Powerups(game,'check', 1);
+    },
+    updateLevelTwo: function()
+    {
+    },
+    loadLevelThree: function()
+    {
+        enemies = new Enemies(game, 'police', 10);
+        enemies.forEach(function(sprite){sprite.body.setRectangle(30,50,0,0)});
+        //powerups = new Powerups(game,'check', 1);
+    },
+    updateLevelThree: function()
+    {
     }
 };
