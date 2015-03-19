@@ -5,8 +5,6 @@ Game.Play = function(game)
 
 //Sprites
 var player;
-var enemies;
-var powerups;
 
 var scoreInterval;
 var enemyInterval;
@@ -14,17 +12,21 @@ var powerupInterval;
 var hitInterval;
 
 var hits = 0;
-var checksCollected =0;
-var cidersCollected = 0;
+var levelProgress = 0;
 
 //Text Indicators
 var score;
 var multiplier;
 
+var levelStateManager;
+
 var restart = false;
+var GameState = 'level_one';
 
 Game.Play.prototype =  
 {
+    enemies: undefined,
+    powerups: undefined,
     init: function()
     {
         if(restart){
@@ -33,8 +35,15 @@ Game.Play.prototype =
            score.setValue(0);
            strikes.setValue('');
            player.resetSpeed();
+           levelProgress = 0;
         }
-        restart = true;
+        else
+        {
+            levelStateManager = LevelStateManager;
+            levelStateManager.initialize();
+            restart = true;
+
+        }
     },
     create: function() {
         //Physics System
@@ -43,7 +52,9 @@ Game.Play.prototype =
         player = new Player(game);
         player.getBody().onBeginContact.add(this.playerHit, this);
 
-        this.loadLevelThree();
+        LevelStateManager.load(game);
+        this.enemies = LevelStateManager.enemies;
+        this.powerups = LevelStateManager.powerups;
 
         //  1 controls.
         cursors = game.input.keyboard.createCursorKeys();
@@ -53,8 +64,9 @@ Game.Play.prototype =
         multiplier = new TextIndicator(game, 'Multiplier: %sX',1, 15, 30);
         strikes = new TextIndicator(game, 'Strikes: %s', '', 15, 45)
 
-        scoreInterval = new Interval('static', 2000, 0);
+        scoreInterval = new Interval('static', 500, 0);
         enemyInterval = new Interval('static', 1500, 0);
+        enemyInterval.setDecrement(25);
         powerupInterval = new Interval('random', 20000, game.time.now+4000);
         hitInterval = new Interval('static', 300,0);
     },
@@ -63,7 +75,8 @@ Game.Play.prototype =
 
         player.resetVelocity();
         player.move(cursors);
-        this.updateLevelThree();
+
+        LevelStateManager.update(game, levelProgress);
 
         if(scoreInterval.checkInterval(game.time.now))
         {
@@ -73,7 +86,7 @@ Game.Play.prototype =
         {
             this.spawnEnemy();
         }
-        if(powerupInterval.checkInterval(game.time.now) && powerups != null)
+        if(powerupInterval.checkInterval(game.time.now) && this.powerups != null)
         {
             this.spawnPowerUp();
         }
@@ -86,7 +99,7 @@ Game.Play.prototype =
         var y = 0;
         var tox = 0;
         var toy= 0;
-        var enemy = enemies.getGroup().getFirstDead();
+        var enemy = this.enemies.getGroup().getFirstDead();
         if(enemy!= null)
         {
 
@@ -130,7 +143,7 @@ Game.Play.prototype =
     },
     playerHit: function(contact, enemy)
     {
-        if(contact !=null && contact.sprite.key==enemies.spriteName && hitInterval.checkInterval(game.time.now))
+        if(contact !=null && contact.sprite.key==this.enemies.spriteName && hitInterval.checkInterval(game.time.now))
         {
             player.performCollision();
             this.game.tweens.removeFrom(contact);
@@ -139,53 +152,26 @@ Game.Play.prototype =
             contact.sprite.kill();
             strikes.setValue(strikes.getValue() + "X")
             multiplier.setValue(1);
+            enemyInterval.reset();
             if(++hits >= 3)
             {
                game.state.start('Over', true, false, 'game_over', 'Game Over!');
             }
         }
-        if(contact !=null && powerups !=null && contact.sprite.key==powerups.spriteName)
+        if(contact !=null && this.powerups !=null && contact.sprite.key==this.powerups.spriteName)
         {
             contact.sprite.kill();
             multiplier.setValue(multiplier.getValue() + 1);
+            levelProgress += 1;
         }
-
     },
     spawnPowerUp: function()
     {
-        var powerup = powerups.getGroup().getFirstDead();
+        var powerup = this.powerups.getGroup().getFirstDead();
         if(powerup !=null)
         {
             powerup.reset(rand(w-20),rand(h-20));
             powerupsTime = game.time.now + powerupInterval;
         }
-    },
-    loadLevelOne: function()
-    {
-        enemies = new Enemies(game, 'beer', 10);
-        //enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
-        powerups = new Powerups(game,'cider', 1);
-    },
-    updateLevelOne: function()
-    {
-    enemies.rotateAll(2);
-    },
-    loadLevelTwo: function()
-    {
-        enemies = new Enemies(game, 'tree', 10);
-        enemies.forEach(function(sprite){sprite.body.setRectangle(40,50,0,0)});
-        powerups = new Powerups(game,'check', 1);
-    },
-    updateLevelTwo: function()
-    {
-    },
-    loadLevelThree: function()
-    {
-        enemies = new Enemies(game, 'police', 10);
-        enemies.forEach(function(sprite){sprite.body.setRectangle(30,50,0,0)});
-        //powerups = new Powerups(game,'check', 1);
-    },
-    updateLevelThree: function()
-    {
     }
 };
