@@ -153,6 +153,7 @@ Game.Play.prototype =
             strikes.setValue(strikes.getValue() + "X")
             multiplier.setValue(1);
             enemyInterval.reset();
+            this.enemies.forEach(function(sprite){sprite.kill();});
             if(++hits >= 3)
             {
                game.state.start('Over', true, false, 'game_over', 'Game Over!');
