@@ -111,6 +111,10 @@ var LevelStateManager =
 	changeState: function(state)
 	{
 		this.state = state;
+	},
+	reset: function()
+	{
+		this.state = this.states.level_one;
 	}
 
 }

@@ -156,6 +156,7 @@ Game.Play.prototype =
             this.enemies.forEach(function(sprite){sprite.kill();});
             if(++hits >= 3)
             {
+                levelStateManager.reset();
                game.state.start('Over', true, false, 'game_over', 'Game Over!');
             }
         }

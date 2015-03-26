@@ -27,7 +27,7 @@ Enemies.prototype.addEnemy = function()
 	var sprite = game.add.sprite(-40, -40, this.spriteName);
 	sprite.exists = false;
     sprite.alive = false;
-    game.physics.p2.enable(sprite, true);
+    game.physics.p2.enable(sprite, false);
     //sprite.body.angle = 500;
     this.group.add(sprite)
 };
